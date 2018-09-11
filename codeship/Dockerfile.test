@@ -1,0 +1,20 @@
+#
+# gcr.io/advisorconnect-1238/service-ingest-initiation
+#
+FROM us.gcr.io/advisorconnect-1238/python3:latest
+MAINTAINER <michael@advisorconnect.co>
+
+LABEL co.advisorconnect.image=us.gcr.io/advisorconnect-1238/service-ingest-initiation
+
+#
+# ONBUILD commands that run as a reuslt of instructions from
+#         the parent container:
+#
+#    * requirements.txt is copied to the container
+#    * pip install of the requirements is run
+#    * All source co-located with the Dockerfile is copied
+#      to /usr/local/app
+#
+
+CMD ["python", "app.py"]
+#CMD ["bash", "./run.sh"]

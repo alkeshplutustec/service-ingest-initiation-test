@@ -1,0 +1,25 @@
+testing_build:
+  build:
+    image: advisorconnect/is_testing
+    dockerfile: codeship/Dockerfile.test
+  dockercfg_service: gcr_dockercfg
+  cached: true
+deploy_build:
+  build:
+    image: us.gcr.io/advisorconnect-1238/service-ingest-initiation
+    dockerfile: Dockerfile
+  dockercfg_service: gcr_dockercfg
+  cached: true
+gcr_dockercfg:
+  image: codeship/gcr-dockercfg-generator
+  add_docker: true
+  encrypted_env_file: codeship/.google_deployment.env.encrypted
+  cached: true
+google_cloud_deployment:
+  image: codeship/google-cloud-deployment
+  encrypted_env_file: codeship/.google_deployment.env.encrypted
+  # Add Docker if you want to interact with the Google Container Engine and Google Container Registry
+  add_docker: true
+  cached: true
+  volumes:
+    - ./:/deploy

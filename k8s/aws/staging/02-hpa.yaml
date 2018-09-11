@@ -1,0 +1,14 @@
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: svc-ingest-initiation-hpa-staging
+  namespace: staging
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: svc-ingest-initiation-staging
+    namespace: staging
+  minReplicas: 1
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 75

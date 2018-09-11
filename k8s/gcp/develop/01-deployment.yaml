@@ -1,0 +1,204 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: svc-ingest-initiation-develop
+  labels:
+    env: develop
+    name: svc-ingest-initiation-develop
+  annotations:
+    contact: Chris Perry
+    description: Ingestion Service DEVELOP
+  namespace: develop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: svc-ingest-initiation-develop
+  template:
+    metadata:
+      labels:
+        name: svc-ingest-initiation-develop
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: general-pool-micro
+      containers:
+      - name: svc-ingest-initiation-develop
+        image: us.gcr.io/advisorconnect-1238/service-ingest-initiation:develop
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: 1
+            memory: "1Gi"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - /usr/src/app/health_check.py
+            - liveness
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - /usr/src/app/health_check.py
+            - readiness
+          periodSeconds: 30
+        env:
+        - name: SERVICE_NAME
+          value: SVC-INGESTION
+        - name: FLASK_DEBUG
+          value: "true"
+        - name: C_FORCE_ROOT
+          value: "true"
+        - name: LC_ALL
+          value: "C.UTF-8"
+        - name: LANG
+          value: "C.UTF-8"
+        # ./common_configs/env.py
+        - name: FLASK_ENV
+          value: develop
+        # ./common_configs/service.py
+        - name: GC_PROJECT
+          value: advisorconnect-1238
+        - name: SS_PUBLIC_URL
+          value: http://svc-search-develop
+        - name: DAS_PUBLIC_URL
+          value: http://svc-data-adapter-develop
+        - name: ERS_PUBLIC_URL
+          value: http://svc-entity-resolution-develop
+        - name: SEA_PUBLIC_URL
+          value: http://svc-external-api-develop
+        - name: STORAGE_USER_BUCKET
+          value: user_onboarding_develop
+        - name: RABBIT_HOST
+          value: rabbitmq.vnext
+        - name: RABBIT_PORT
+          value: "5672"
+        - name: RABBIT_MGT_HOST
+          value: rabbitmq-mgt.vnext
+        - name: RABBIT_MGT_PORT
+          value: "15672"
+        - name: RABBIT_VHOST
+          value: develop
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: develop-secrets
+              key: aws-access-key
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: develop-secrets
+              key: aws-secret-key
+        - name: RABBIT_USER
+          valueFrom:
+            secretKeyRef:
+              name: develop-secrets
+              key: rabbit-user
+        - name: RABBIT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: develop-secrets
+              key: rabbit-pass
+        - name: RABBIT_INGESTION_REPLICAS
+          value: "3"
+        - name: UI_API_QUEUE
+          value: ui-api-develop
+        - name: SVC_SYNC_QUEUE
+          value: svc-sync-develop
+        - name: SVC_SEARCH_QUEUE
+          value: svc-search-develop
+        - name: SVC_INGEST_INITIATION_QUEUE
+          value: svc-ingest-initiation-develop
+        - name: SVC_INGESTION_QUEUE
+          value: svc-ingestion-develop
+        - name: SVC_INGEST_STORAGE_QUEUE
+          value: svc-ingest-storage-develop
+        - name: SVC_DATA_ADAPTER_QUEUE
+          value: svc-data-adapter-develop
+        - name: SVC_ENTITY_RESOLUTION_QUEUE
+          value: svc-entity-resolution-develop
+        - name: SVC_PROCESSING_QUEUE
+          value: svc-processing-develop
+        - name: SVC_BILLING_QUEUE
+          value: svc-billing-develop
+        - name: REDIS_HOST
+          value: redis.infrastructure
+        - name: REDIS_PORT
+          value: "6379"
+        # ./common_configs/service.py
+        - name: ES_URL
+          value: http://elasticsearch.infrastructure
+        - name: ES_PORT
+          value: "9200"
+        - name: ES_PROSPECT_INDEX
+          value: advisorconnect_data_v2_dev
+        - name: ES_PROSPECT_DOC_TYPE
+          value: prospect
+        - name: ES_CRAWLERA_PROSPECT_US_INDEX
+          value: advisorconnect_crawlera_prospect_us
+        - name: ES_CRAWLERA_PROSPECT_NON_US_INDEX
+          value: advisorconnect_crawlera_prospect_non_us
+        - name: ES_CRAWLERA_PROSPECT_DOC_TYPE
+          value: prospect
+        - name: ES_CRAWLERA_COMPANY_INDEX
+          value: advisorconnect_crawlera_company
+        - name: ES_CRAWLERA_COMPANY_INDEX_DOC_TYPE
+          value: company
+        - name: ES_CRAWLERA_UNIVERSITY_INDEX
+          value: advisorconnect_crawlera_university
+        - name: ES_CRAWLERA_UNIVERSITY_INDEX_DOC_TYPE
+          value: university
+        - name: ES_ORGANIZATION_DOC_TYPE
+          value: organization
+        - name: ES_API_INDEX
+          value: advisorconnect_api_cache_v1
+        - name: ES_API_CALL_DOC_TYPE
+          value: api_call
+        - name: ES_BILLING_INDEX
+          value: advisorconnect_billing_v1_dev
+        - name: ES_BILLING_BALANCE_DOC_TYPE
+          value: balance
+        - name: ES_BILLING_LOGS
+          value: log
+        - name: ES_BILLING_PRICE
+          value: price
+        - name: ES_DEFAULT_PER_PAGE
+          value: "100"
+        - name: ES_RECOMMEND_PER_PAGE
+          value: "10"
+        - name: ES_RESOLUTION_PER_PAGE
+          value: "10"
+        # ./app.py
+        - name: ENVIRONMENT
+          value: develop
+        # ./conf/config.py
+#        - name: RUN_HOST
+#          value: "0.0.0.0"
+#        - name: RUN_PORT
+#          value: "80"
+#        - name: ERS_FULLCONTACT
+#          value: "True"
+#        - name: ERS_PIPL
+#          value: "False"
+#        - name: ERS_NEXTCALLER
+#          value: "False"
+#        - name: ERS_FORCE
+#          value: "True"
+#        - name: ERS_MACROMEASURES
+#          value: "true"
+        - name: SENTRY_API_KEY_URL
+          value: "https://efc419e7d2ad4866a0319730c6c39b58:523fbb7b1a9f40ad97d0dc09917ae5f8@sentry.io/105088"
+        - name: NEWRELIC_KEY
+          valueFrom:
+            secretKeyRef:
+              name: develop-secrets
+              key: newrelic-key

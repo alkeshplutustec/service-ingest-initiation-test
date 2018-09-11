@@ -1,0 +1,45 @@
+- name: TEST UNIT TESTS
+  service: testing_build
+  dockercfg_service: gcr_dockercfg
+  command: pytest --ignore=venv/ --ignore=common_configs/ -rxs --cov=./ --cov-report=term-missing -v
+- name: BUILD UNIT TESTS
+  service: deploy_build
+  tag: "^(develop|production|staging)$"
+  dockercfg_service: gcr_dockercfg
+  command: pytest --ignore=venv/ --ignore=common_configs/ -rxs --cov=./ --cov-report=term-missing -v
+- name: PUSH DEVELOP OR STAGING IMAGE
+  tag: "^(develop|staging)$"
+  service: deploy_build
+  type: push
+  image_name: us.gcr.io/advisorconnect-1238/service-ingest-initiation
+  image_tag: "{{.Branch}}"
+  registry: https://us.gcr.io
+  dockercfg_service: gcr_dockercfg
+- name: PUSH DEVELOP OR STAGING VERSIONED IMAGE
+  tag: "^(develop|staging)$"
+  service: deploy_build
+  type: push
+  image_name: us.gcr.io/advisorconnect-1238/service-ingest-initiation
+  image_tag: "{{.Branch}}-{{.Timestamp}}-{{.CommitID}}-{{.CommitterUsername}}"
+  registry: https://us.gcr.io
+  dockercfg_service: gcr_dockercfg
+- name: PUSH PROD IMAGE
+  tag: "production"
+  service: deploy_build
+  type: push
+  image_name: us.gcr.io/advisorconnect-1238/service-ingest-initiation
+  image_tag: "2.1.0"
+  registry: https://us.gcr.io
+  dockercfg_service: gcr_dockercfg
+- name: PUSH PROD VERSIONED IMAGE
+  tag: "production"
+  service: deploy_build
+  type: push
+  image_name: us.gcr.io/advisorconnect-1238/service-ingest-initiation
+  image_tag: "2.1.0-{{.Timestamp}}-{{.CommitID}}-{{.CommitterUsername}}"
+  registry: https://us.gcr.io
+  dockercfg_service: gcr_dockercfg
+- name: DEPLOY DEVELOP OR STAGING
+  tag: "^(develop|production|staging)$"
+  service: google_cloud_deployment
+  command: /deploy/scripts/deploy_to_k8s.sh

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Ingestion Service PRODUCTION
+    contact: Chris Perry
+  labels:
+    env: production
+    name: svc-ingest-initiation-production
+  name: svc-ingest-initiation-production
+  namespace: production
+spec:
+  ports:
+  - name: http
+    targetPort: http
+    port: 80
+    protocol: TCP
+  selector:
+    name: svc-ingest-initiation-production
+  type: ClusterIP

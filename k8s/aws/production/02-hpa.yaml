@@ -1,0 +1,14 @@
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: svc-ingest-initiation-hpa-production
+  namespace: production
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: svc-ingest-initiation-production
+    namespace: production
+  minReplicas: 1
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 75
