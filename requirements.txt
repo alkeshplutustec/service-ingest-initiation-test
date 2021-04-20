@@ -38,7 +38,7 @@ packaging==16.8
 pika==0.10.0
 piplapis-python==5.1.0
 psutil==4.3.1
-py==1.4.33
+py==1.10.0
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pycrypto==2.6.1
